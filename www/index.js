@@ -53,7 +53,7 @@ const getIndex = (row, column) => {
 
 const drawCells = () => {
     const cellsPtr = universe.cells();
-    const cells = new Uint8Array(memory.buffer, cellsPtr, width * height);
+    const cells = new Uint8Array(memory.buffer, cellsPtr, width * height / 8);
 
     ctx.beginPath();
 
@@ -61,7 +61,7 @@ const drawCells = () => {
         for (let col = 0; col < width; col++) {
             const idx = getIndex(row, col);
 
-            ctx.fillStyle = cells[idx] === Cell.Dead
+            ctx.fillStyle = !bitIsSet(idx, cells)
                 ? DEAD_COLOR
                 : ALIVE_COLOR;
 
@@ -76,6 +76,12 @@ const drawCells = () => {
 
     ctx.stroke();
 };
+
+const bitIsSet = (n, arr) => {
+    const byte = Math.floor(n / 8);
+    const mask = 1 << (n % 8);
+    return (arr[byte] & mask) === mask;
+}
 
 drawGrid();
 drawCells();
